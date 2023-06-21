@@ -17,7 +17,7 @@ from urllib3.exceptions import MaxRetryError, ProtocolError
 
 from helpers import (CONTENT_TYPE_BASE64_BINARY, CONTENT_TYPE_TEXT,
                      WATCH_CLIENT_TIMEOUT, WATCH_SERVER_TIMEOUT, execute,
-                     remove_file, request, unique_filename, write_data_to_file)
+                     remove_file, request_primary, request_resource, unique_filename, write_data_to_file)
 from logger import get_logger
 
 RESOURCE_SECRET = "secret"
@@ -74,9 +74,9 @@ def _get_file_data_and_name(full_filename, content, enable_5xx, content_type=CON
         filename = full_filename[:-4]
         if content_type == CONTENT_TYPE_BASE64_BINARY:
             file_url = file_data.decode('utf8')
-            file_data = request(file_url, "GET", enable_5xx).content
+            file_data = request_resource(file_url, "GET", enable_5xx).content
         else:
-            file_data = request(file_data, "GET", enable_5xx).text
+            file_data = request_resource(file_data, "GET", enable_5xx).text
     else:
         filename = full_filename
 
@@ -156,7 +156,7 @@ def list_resources(label, label_value, target_folder, request_url, request_metho
         execute(script)
 
     if request_url and files_changed:
-        request(request_url, request_method, enable_5xx, request_payload)
+        request_primary(request_url, request_method, True, enable_5xx, request_payload)
 
 
 def _process_secret(dest_folder, secret, resource, unique_filenames, enable_5xx, is_removed=False):
@@ -359,7 +359,7 @@ def _watch_resource_iterator(label, label_value, target_folder, request_url, req
             execute(script)
 
         if request_url and files_changed:
-            request(request_url, request_method, enable_5xx, request_payload)
+            request_primary(request_url, request_method, enable_5xx, request_payload)
 
 
 def _watch_resource_loop(mode, *args):

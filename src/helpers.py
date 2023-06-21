@@ -109,17 +109,29 @@ def remove_file(folder, filename):
         logger.error(f"Unable to remove {complete_file}, file not found")
         return False
 
-
-def request(url, method, enable_5xx=False, payload=None):
-    enforce_status_codes = list() if enable_5xx else [500, 502, 503, 504]
-
+def _get_auth():
+    auth = None
     username = os.getenv("REQ_USERNAME")
     password = os.getenv("REQ_PASSWORD")
     encoding = 'latin1' if not os.getenv("REQ_BASIC_AUTH_ENCODING") else os.getenv("REQ_BASIC_AUTH_ENCODING")
     if username and password:
         auth = HTTPBasicAuth(username.encode(encoding), password.encode(encoding))
-    else:
-        auth = None
+    return auth
+    
+
+def request_primary(url, method, enable_5xx=False, payload=None):
+    auth = _get_auth()
+    _request_internal(url, method, auth, enable_5xx, payload)
+
+def request_resource(url, method, enable_5xx=False, payload=None):
+    auth = None
+    should_auth_primary_only = False if not os.getenv("REQ_AUTH_PRIMARY_ONLY") else os.getenv("REQ_AUTH_PRIMARY_ONLY")
+    if not should_auth_primary_only:
+        auth = _get_auth()
+    _request_internal(url, method, auth, enable_5xx, payload)
+
+def _request_internal(url, method, auth, enable_5xx, payload=None):
+    enforce_status_codes = list() if enable_5xx else [500, 502, 503, 504]
 
     r = requests.Session()
 
