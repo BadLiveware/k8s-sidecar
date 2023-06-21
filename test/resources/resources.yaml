@@ -95,6 +95,15 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: url-configmap-insecure
+  labels:
+    findme: "yup"
+data:
+  fail_on_http_basic.txt.url: "http://dummy-server/fail_on_http_basic"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: url-configmap-binary-download
   labels:
     findme: "yup"
