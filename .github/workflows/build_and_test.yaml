@@ -142,6 +142,7 @@ jobs:
           kubectl cp sidecar:/tmp/secured.txt /tmp/sidecar/secured.txt
           kubectl cp sidecar:/tmp/similar-configmap.txt /tmp/sidecar/similar-configmap.txt
           kubectl cp sidecar:/tmp/similar-secret.txt /tmp/sidecar/similar-secret.txt
+          kubectl cp sidecar:/tmp/fail_on_http_basic.txt /tmp/sidecar/fail_on_http_basic.txt
 
           echo "Downloading resource files from sidecar-5xx..."
           kubectl cp sidecar-5xx:/tmp-5xx/hello.world /tmp/sidecar-5xx/hello.world
